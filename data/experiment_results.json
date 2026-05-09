@@ -1,0 +1,237 @@
+{
+  "problem": {
+    "grid_size": 20,
+    "start": [
+      10,
+      10
+    ],
+    "apples": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        5,
+        8
+      ],
+      [
+        6,
+        15
+      ],
+      [
+        8,
+        18
+      ],
+      [
+        10,
+        1
+      ],
+      [
+        11,
+        17
+      ],
+      [
+        13,
+        6
+      ],
+      [
+        15,
+        12
+      ],
+      [
+        16,
+        2
+      ],
+      [
+        17,
+        14
+      ],
+      [
+        18,
+        16
+      ]
+    ],
+    "wall_mode": "wrap"
+  },
+  "cpu_threads": 12,
+  "experiments": [
+    {
+      "slug": "astar",
+      "label": "A*",
+      "approach": "astar",
+      "optimizer": "a_star",
+      "completed": true,
+      "solver_steps": 69,
+      "replay_steps": 71,
+      "score": 69.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 0.5273731010000002,
+      "wall_time_seconds": 0.09895876399968984,
+      "file": "trajectory.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 0,
+      "optimality_ratio": 1.0
+    },
+    {
+      "slug": "genetic",
+      "label": "Genetic",
+      "approach": "genetic",
+      "optimizer": "genetic",
+      "completed": true,
+      "solver_steps": 93,
+      "replay_steps": 95,
+      "score": 93.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 5.109531102,
+      "wall_time_seconds": 5.086412609998661,
+      "file": "genetic.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 24,
+      "optimality_ratio": 1.3380281690140845
+    },
+    {
+      "slug": "simulated_annealing",
+      "label": "Simulated Annealing",
+      "approach": "simulated_annealing",
+      "optimizer": "annealing",
+      "completed": true,
+      "solver_steps": 119,
+      "replay_steps": 121,
+      "score": 119.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 0.24799235900000127,
+      "wall_time_seconds": 0.2466938170036883,
+      "file": "simulated_annealing.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 50,
+      "optimality_ratio": 1.704225352112676
+    },
+    {
+      "slug": "metropolis",
+      "label": "Metropolis",
+      "approach": "metropolis",
+      "optimizer": "metropolis",
+      "completed": true,
+      "solver_steps": 101,
+      "replay_steps": 97,
+      "score": 101.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 0.25688055,
+      "wall_time_seconds": 0.25547594299860066,
+      "file": "metropolis.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 26,
+      "optimality_ratio": 1.3661971830985915
+    },
+    {
+      "slug": "tiny_dqn_extended_kalman_filter",
+      "label": "Tiny DQN MLP + EKF",
+      "approach": "dqn",
+      "optimizer": "extended_kalman_filter",
+      "completed": true,
+      "solver_steps": 313,
+      "replay_steps": 89,
+      "score": 313.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 556.493747382,
+      "wall_time_seconds": 91.61441791200195,
+      "file": "tiny_dqn_extended_kalman_filter.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 18,
+      "optimality_ratio": 1.2535211267605635
+    },
+    {
+      "slug": "tiny_dqn_levenberg_marquardt",
+      "label": "Tiny DQN MLP + LM",
+      "approach": "dqn",
+      "optimizer": "levenberg_marquardt",
+      "completed": true,
+      "solver_steps": 309,
+      "replay_steps": 71,
+      "score": 309.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 521.793258141,
+      "wall_time_seconds": 75.80732410199562,
+      "file": "tiny_dqn_levenberg_marquardt.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 0,
+      "optimality_ratio": 1.0
+    },
+    {
+      "slug": "tiny_dqn_adam",
+      "label": "Tiny DQN MLP + Adam",
+      "approach": "dqn",
+      "optimizer": "adam",
+      "completed": true,
+      "solver_steps": 291,
+      "replay_steps": 77,
+      "score": 291.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 48.65124565600013,
+      "wall_time_seconds": 7.435798416998296,
+      "file": "tiny_dqn_adam.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 6,
+      "optimality_ratio": 1.0845070422535212
+    },
+    {
+      "slug": "kohonen_extended_kalman_filter",
+      "label": "Kohonen + EKF",
+      "approach": "kohonen",
+      "optimizer": "extended_kalman_filter",
+      "completed": true,
+      "solver_steps": 97,
+      "replay_steps": 103,
+      "score": 97.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 60.27574826199998,
+      "wall_time_seconds": 10.545306638996408,
+      "file": "kohonen_extended_kalman_filter.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 32,
+      "optimality_ratio": 1.4507042253521127
+    },
+    {
+      "slug": "kohonen_levenberg_marquardt",
+      "label": "Kohonen + LM",
+      "approach": "kohonen",
+      "optimizer": "levenberg_marquardt",
+      "completed": true,
+      "solver_steps": 93,
+      "replay_steps": 85,
+      "score": 93.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 21.95830107100005,
+      "wall_time_seconds": 4.734730955002306,
+      "file": "kohonen_levenberg_marquardt.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 14,
+      "optimality_ratio": 1.1971830985915493
+    },
+    {
+      "slug": "kohonen_adam",
+      "label": "Kohonen + Adam",
+      "approach": "kohonen",
+      "optimizer": "adam",
+      "completed": true,
+      "solver_steps": 89,
+      "replay_steps": 86,
+      "score": 89.0,
+      "apples_collected": 13,
+      "cpu_time_seconds": 11.598681617000011,
+      "wall_time_seconds": 1.7292601189983543,
+      "file": "kohonen_adam.json",
+      "optimal_replay_steps": 71,
+      "replay_steps_over_optimal": 15,
+      "optimality_ratio": 1.2112676056338028
+    }
+  ]
+}

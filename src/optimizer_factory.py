@@ -23,7 +23,7 @@ def dqn_optimizer(name: str, params) -> object:
     if name == "newton":
         return Newton(params, line_search_method="armijo")
     if name == "extended_kalman_filter":
-        return ExtendedKalmanFilter(params, q=1e-5, tau=0.99)
+        return ExtendedKalmanFilter(params, q=1e-3, tau=0.95)
     if name == "levenberg_marquardt":
         return LevenbergMarquardt(params, mu=10.0, strategy="line search", line_search_method="armijo")
     if name == "annealing":
@@ -66,7 +66,7 @@ def kohonen_optimizer(name: str, params) -> object:
     if name == "adam":
         return torch.optim.Adam(params, lr=2e-2)
     if name == "extended_kalman_filter":
-        return ExtendedKalmanFilter(params, q=1e-5, tau=0.995)
+        return ExtendedKalmanFilter(params, q=1e-3, tau=0.98)
     if name == "levenberg_marquardt":
         return LevenbergMarquardt(params, mu=5.0, strategy="line search", line_search_method="armijo")
     raise ValueError(f"Unknown Kohonen optimizer: {name}")

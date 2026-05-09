@@ -1,32 +1,42 @@
 [
   {
     "label": "A*",
-    "file": "trajectory.json",
-    "group": "Search"
-  },
-  {
-    "label": "DQN (Adam)",
-    "file": "dqn_adam.json",
-    "group": "Learned"
-  },
-  {
-    "label": "Kohonen",
-    "file": "kohonen.json",
-    "group": "Learned"
+    "file": "trajectory.json"
   },
   {
     "label": "Genetic",
-    "file": "genetic.json",
-    "group": "Route"
+    "file": "genetic.json"
   },
   {
     "label": "Simulated Annealing",
-    "file": "simulated_annealing.json",
-    "group": "Route"
+    "file": "simulated_annealing.json"
   },
   {
     "label": "Metropolis",
-    "file": "metropolis.json",
-    "group": "Route"
+    "file": "metropolis.json"
+  },
+  {
+    "label": "Tiny DQN MLP + EKF",
+    "file": "tiny_dqn_extended_kalman_filter.json"
+  },
+  {
+    "label": "Tiny DQN MLP + LM",
+    "file": "tiny_dqn_levenberg_marquardt.json"
+  },
+  {
+    "label": "Tiny DQN MLP + Adam",
+    "file": "tiny_dqn_adam.json"
+  },
+  {
+    "label": "Kohonen + EKF",
+    "file": "kohonen_extended_kalman_filter.json"
+  },
+  {
+    "label": "Kohonen + LM",
+    "file": "kohonen_levenberg_marquardt.json"
+  },
+  {
+    "label": "Kohonen + Adam",
+    "file": "kohonen_adam.json"
   }
 ]
