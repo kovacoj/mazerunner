@@ -27,8 +27,9 @@ jobs:
 
       - name: Stage static site
         run: |
-          mkdir -p site/data
-          cp -R frontend/. site/
+          mkdir -p site/frontend site/data
+          cp pages/index.html site/index.html
+          cp -R frontend/. site/frontend/
           cp data/*.json site/data/
           touch site/.nojekyll
 
