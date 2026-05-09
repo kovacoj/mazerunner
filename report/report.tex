@@ -23,7 +23,7 @@ The project studies a deterministic variant of the Snake game on a fixed $20 \ti
 
 The task is to eat all apples while minimizing the total trajectory length. Since the apples are static, the problem is closely related to a travelling-salesman-style ordering problem on a wrapped grid. Unlike a pure travelling salesman formulation, however, the snake body grows after each collected apple, so a route is only valid if it also avoids self-collisions during execution.
 
-For this reason, each method is evaluated not only by the route it proposes, but by the replay trajectory that can actually be executed by the backend and visualized in the frontend.
+This makes it a more challenging combinatorial optimization problem than a standard TSP, and it also means that the optimal solution is not necessarily the shortest path through the apple locations. The benchmark instance is small enough to allow for an effectively optimal solution by A* search, which serves as a reference for evaluating the quality of approximate and learned methods.
 
 \section{Approaches}
 
