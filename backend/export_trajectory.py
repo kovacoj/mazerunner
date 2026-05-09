@@ -14,26 +14,27 @@ DEFAULT_OUTPUT = Path("data/trajectory.json")
 
 def sample_trajectory():
     apples = [
-        Point(5, 3),
-        Point(9, 6),
-        Point(13, 6),
-        Point(13, 11),
-        Point(16, 14),
+        Point(0, 3),
+        Point(3, 3),
+        Point(3, 7),
+        Point(19, 7),
+        Point(16, 12),
     ]
     initial_snake = [
-        Point(2, 3),
-        Point(1, 3),
-        Point(0, 3),
-        Point(0, 2),
+        Point(18, 3),
+        Point(17, 3),
+        Point(16, 3),
+        Point(15, 3),
     ]
 
     return build_trajectory(
-        title="Sample orchard run",
+        title="Wrapped orchard run",
         grid_size=20,
         frame_duration_ms=160,
         apples=apples,
         visit_order=[0, 1, 2, 3, 4],
         initial_snake=initial_snake,
+        wall_mode="wrap",
     )
 
 

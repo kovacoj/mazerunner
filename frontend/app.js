@@ -23,6 +23,21 @@ function normalizePoint(point) {
   };
 }
 
+function mod(value, divisor) {
+  return ((value % divisor) + divisor) % divisor;
+}
+
+function normalizePointForBoard(point, gridSize, wallMode) {
+  if (wallMode !== "wrap") {
+    return point;
+  }
+
+  return {
+    x: mod(point.x, gridSize),
+    y: mod(point.y, gridSize),
+  };
+}
+
 function normalizeTrajectory(payload) {
   if (!Array.isArray(payload.frames) || payload.frames.length === 0) {
     throw new Error("Trajectory requires at least one frame.");
@@ -30,7 +45,10 @@ function normalizeTrajectory(payload) {
 
   const gridSize = Number(payload.gridSize || 20);
   const frameDurationMs = Number(payload.frameDurationMs || 160);
-  const apples = Array.isArray(payload.apples) ? payload.apples.map(normalizePoint) : [];
+  const wallMode = payload.wallMode === "wrap" ? "wrap" : "bounded";
+  const apples = Array.isArray(payload.apples)
+    ? payload.apples.map((point) => normalizePointForBoard(normalizePoint(point), gridSize, wallMode))
+    : [];
 
   const frames = payload.frames.map((frame, index) => {
     if (!Array.isArray(frame.snake) || frame.snake.length === 0) {
@@ -38,7 +56,7 @@ function normalizeTrajectory(payload) {
     }
 
     return {
-      snake: frame.snake.map(normalizePoint),
+      snake: frame.snake.map((point) => normalizePointForBoard(normalizePoint(point), gridSize, wallMode)),
       eaten: new Set(Array.isArray(frame.eaten) ? frame.eaten : []),
     };
   });
@@ -47,6 +65,7 @@ function normalizeTrajectory(payload) {
     title: payload.title || "Snake trajectory",
     gridSize,
     frameDurationMs,
+    wallMode,
     apples,
     frames,
   };

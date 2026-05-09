@@ -29,6 +29,7 @@ class Trajectory:
     title: str
     grid_size: int
     frame_duration_ms: int
+    wall_mode: str
     apples: tuple[Point, ...]
     frames: tuple[Frame, ...]
 
@@ -37,6 +38,7 @@ class Trajectory:
             "title": self.title,
             "gridSize": self.grid_size,
             "frameDurationMs": self.frame_duration_ms,
+            "wallMode": self.wall_mode,
             "apples": [apple.as_dict() for apple in self.apples],
             "frames": [frame.as_dict() for frame in self.frames],
         }
@@ -46,11 +48,23 @@ def _is_in_bounds(point: Point, grid_size: int) -> bool:
     return 0 <= point.x < grid_size and 0 <= point.y < grid_size
 
 
-def _is_adjacent(a: Point, b: Point) -> bool:
-    return abs(a.x - b.x) + abs(a.y - b.y) == 1
+def _validate_wall_mode(wall_mode: str) -> None:
+    if wall_mode not in {"bounded", "wrap"}:
+        raise ValueError("Wall mode must be 'bounded' or 'wrap'.")
 
 
-def _validate_snake(snake: tuple[Point, ...], grid_size: int) -> None:
+def _axis_distance(a: int, b: int, grid_size: int, wall_mode: str) -> int:
+    diff = abs(a - b)
+    if wall_mode == "wrap":
+        return min(diff, grid_size - diff)
+    return diff
+
+
+def _is_adjacent(a: Point, b: Point, grid_size: int, wall_mode: str) -> bool:
+    return _axis_distance(a.x, b.x, grid_size, wall_mode) + _axis_distance(a.y, b.y, grid_size, wall_mode) == 1
+
+
+def _validate_snake(snake: tuple[Point, ...], grid_size: int, wall_mode: str) -> None:
     if not snake:
         raise ValueError("Initial snake must contain at least one segment.")
 
@@ -62,7 +76,7 @@ def _validate_snake(snake: tuple[Point, ...], grid_size: int) -> None:
             raise ValueError(f"Snake segment {segment} is out of bounds.")
 
     for head, tail in zip(snake, snake[1:]):
-        if not _is_adjacent(head, tail):
+        if not _is_adjacent(head, tail, grid_size, wall_mode):
             raise ValueError("Initial snake must be a contiguous orthogonal chain.")
 
 
@@ -84,17 +98,28 @@ def _validate_visit_order(visit_order: tuple[int, ...], apple_count: int) -> Non
             raise ValueError(f"Apple index {index} is out of range.")
 
 
-def manhattan_path(start: Point, goal: Point) -> list[Point]:
+def _step_axis(current: int, target: int, grid_size: int, wall_mode: str) -> int:
+    if wall_mode == "wrap":
+        forward = (target - current) % grid_size
+        backward = (current - target) % grid_size
+        if forward <= backward:
+            return (current + 1) % grid_size
+        return (current - 1) % grid_size
+
+    return current + (1 if target > current else -1)
+
+
+def manhattan_path(start: Point, goal: Point, grid_size: int, wall_mode: str) -> list[Point]:
     x = start.x
     y = start.y
     path: list[Point] = []
 
     while x != goal.x:
-        x += 1 if goal.x > x else -1
+        x = _step_axis(x, goal.x, grid_size, wall_mode)
         path.append(Point(x, y))
 
     while y != goal.y:
-        y += 1 if goal.y > y else -1
+        y = _step_axis(y, goal.y, grid_size, wall_mode)
         path.append(Point(x, y))
 
     return path
@@ -108,6 +133,7 @@ def build_trajectory(
     apples: list[Point],
     visit_order: list[int],
     initial_snake: list[Point],
+    wall_mode: str = "bounded",
 ) -> Trajectory:
     if grid_size < 1:
         raise ValueError("Grid size must be at least 1.")
@@ -115,12 +141,14 @@ def build_trajectory(
     if frame_duration_ms < 1:
         raise ValueError("Frame duration must be at least 1 ms.")
 
+    _validate_wall_mode(wall_mode)
+
     apples_tuple = tuple(apples)
     snake = tuple(initial_snake)
     visit_order_tuple = tuple(visit_order)
 
     _validate_apples(apples_tuple, grid_size)
-    _validate_snake(snake, grid_size)
+    _validate_snake(snake, grid_size, wall_mode)
     _validate_visit_order(visit_order_tuple, len(apples_tuple))
 
     if set(apples_tuple) & set(snake):
@@ -134,7 +162,7 @@ def build_trajectory(
     for apple_index in visit_order_tuple:
         target = apples_tuple[apple_index]
 
-        for next_head in manhattan_path(current_snake[0], target):
+        for next_head in manhattan_path(current_snake[0], target, grid_size, wall_mode):
             eaten_index = apple_lookup.get((next_head.x, next_head.y))
             grows = eaten_index is not None and eaten_index not in eaten
             occupied = current_snake if grows else current_snake[:-1]
@@ -155,6 +183,7 @@ def build_trajectory(
         title=title,
         grid_size=grid_size,
         frame_duration_ms=frame_duration_ms,
+        wall_mode=wall_mode,
         apples=apples_tuple,
         frames=tuple(frames),
     )
