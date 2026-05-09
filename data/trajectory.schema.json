@@ -3,7 +3,7 @@
   "$id": "https://mazerunner.local/schemas/trajectory.schema.json",
   "title": "Snake trajectory replay",
   "type": "object",
-  "required": ["title", "gridSize", "frameDurationMs", "apples", "frames"],
+  "required": ["title", "gridSize", "frameDurationMs", "wallMode", "apples", "frames"],
   "additionalProperties": false,
   "properties": {
     "title": {

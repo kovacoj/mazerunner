@@ -10,5 +10,14 @@ dependencies = [
     "pygame>=2.6.1",
     "torch>=2.9.1",
 ]
+
+[project.scripts]
+mazerunner-backend = "backend:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
-packages = ["optimizers"]
+package-dir = {"" = "src"}
+py-modules = ["backend", "trajectory"]
