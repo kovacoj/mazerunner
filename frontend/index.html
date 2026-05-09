@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mazerunner Trajectory Player</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Mazerunner</p>
+        <h1>Snake trajectory replay</h1>
+        <p class="lede">
+          A minimal 20x20 playback surface for backend-generated snake runs.
+        </p>
+      </section>
+
+      <section class="player">
+        <div class="player__board">
+          <canvas id="board" aria-label="Snake trajectory board"></canvas>
+        </div>
+
+        <div class="player__meta">
+          <div>
+            <p class="meta-label">Trajectory</p>
+            <p class="meta-value" id="titleLabel">Loading...</p>
+          </div>
+          <div>
+            <p class="meta-label">Frame</p>
+            <p class="meta-value" id="frameLabel">0 / 0</p>
+          </div>
+          <div>
+            <p class="meta-label">Apples</p>
+            <p class="meta-value" id="appleLabel">0 / 0</p>
+          </div>
+          <div>
+            <p class="meta-label">Speed</p>
+            <p class="meta-value" id="speedLabel">1.0x</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="toggleButton" class="button" type="button">Pause</button>
+          <label class="range-group" for="timeline">
+            <span>Timeline</span>
+            <input id="timeline" type="range" min="0" max="0" value="0" step="1" />
+          </label>
+          <label class="range-group range-group--speed" for="speedControl">
+            <span>Playback</span>
+            <input id="speedControl" type="range" min="0.25" max="2" value="1" step="0.25" />
+          </label>
+        </div>
+
+        <p class="status" id="statusLabel">Loading trajectory...</p>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
