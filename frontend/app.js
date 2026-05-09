@@ -136,11 +136,10 @@ function updateUi() {
   const { frames, apples } = state.trajectory;
   const currentFrame = frames[state.frameIndex];
   const eatenCount = currentFrame.eaten.size;
-  const totalLength = Math.max(frames.length - 1, 0);
 
   titleLabel.textContent = state.trajectory.title;
   appleLabel.textContent = `${eatenCount} / ${apples.length}`;
-  lengthLabel.textContent = `${state.frameIndex} / ${totalLength}`;
+  lengthLabel.textContent = String(state.frameIndex);
   timeline.value = String(state.frameIndex);
   updateToggleButton();
 }

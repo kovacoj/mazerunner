@@ -94,6 +94,10 @@ h1 {
   min-width: 0;
 }
 
+.meta-item--metric {
+  text-align: center;
+}
+
 .meta-value {
   margin: 0;
   font-size: 1rem;
