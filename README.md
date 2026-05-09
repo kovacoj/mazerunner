@@ -13,4 +13,4 @@ We shall compare:
 - Simulated Annealing agent (learned)
 - Kohonen map agent (learned)
 
-Some of these approaches can be mathematically described as a minimization of a cost function. For this, we compare a number of different optimization algorithms, all of them one can find in the [optimizers](./optimizers) submodule. The most promising are quasi-newton methods such as Levenberg-Marquardt and the extended Kalman filter.
+Some of these approaches can be mathematically described as a minimization of a cost function. For this, we compare a number of different optimization algorithms, all of them one can find in the [optimizers](https://github.com/kovacoj/optimizers) submodule. The most promising are quasi-newton methods such as Levenberg-Marquardt and the extended Kalman filter.
