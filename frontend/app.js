@@ -2,13 +2,9 @@ const canvas = document.getElementById("board");
 const context = canvas.getContext("2d");
 
 const titleLabel = document.getElementById("titleLabel");
-const frameLabel = document.getElementById("frameLabel");
 const appleLabel = document.getElementById("appleLabel");
-const speedLabel = document.getElementById("speedLabel");
-const statusLabel = document.getElementById("statusLabel");
 const toggleButton = document.getElementById("toggleButton");
 const timeline = document.getElementById("timeline");
-const speedControl = document.getElementById("speedControl");
 
 const TRAJECTORY_URL = new URL("../data/trajectory.json", import.meta.url);
 
@@ -16,18 +12,9 @@ const state = {
   trajectory: null,
   frameIndex: 0,
   playing: true,
-  speed: 1,
   accumulator: 0,
   lastTimestamp: 0,
 };
-
-function setStatus(message) {
-  statusLabel.textContent = message;
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
 
 function normalizePoint(point) {
   return {
@@ -104,9 +91,7 @@ function updateUi() {
   const eatenCount = currentFrame.eaten.size;
 
   titleLabel.textContent = state.trajectory.title;
-  frameLabel.textContent = `${state.frameIndex + 1} / ${frames.length}`;
   appleLabel.textContent = `${eatenCount} / ${apples.length}`;
-  speedLabel.textContent = `${state.speed.toFixed(2)}x`;
   timeline.value = String(state.frameIndex);
   toggleButton.textContent = state.playing ? "Pause" : state.frameIndex === frames.length - 1 ? "Replay" : "Play";
 }
@@ -149,31 +134,6 @@ function drawGrid(metrics) {
     context.lineTo(offset, metrics.padding + metrics.boardSize);
     context.stroke();
   }
-}
-
-function drawTrail(metrics) {
-  const frames = state.trajectory.frames.slice(0, state.frameIndex + 1);
-  if (frames.length < 2) {
-    return;
-  }
-
-  context.save();
-  context.strokeStyle = "rgba(101, 243, 140, 0.22)";
-  context.lineWidth = Math.max(4, metrics.cell * 0.18);
-  context.lineCap = "round";
-  context.lineJoin = "round";
-
-  context.beginPath();
-  frames.forEach((frame, index) => {
-    const point = centerOf(frame.snake[0], metrics);
-    if (index === 0) {
-      context.moveTo(point.x, point.y);
-    } else {
-      context.lineTo(point.x, point.y);
-    }
-  });
-  context.stroke();
-  context.restore();
 }
 
 function drawApples(metrics, currentFrame) {
@@ -240,7 +200,6 @@ function render() {
   const currentFrame = state.trajectory.frames[state.frameIndex];
 
   drawGrid(metrics);
-  drawTrail(metrics);
   drawApples(metrics, currentFrame);
   drawSnake(metrics, currentFrame);
 }
@@ -269,7 +228,7 @@ function animationLoop(timestamp) {
   state.lastTimestamp = timestamp;
 
   if (state.playing && state.trajectory) {
-    state.accumulator += delta * state.speed;
+    state.accumulator += delta;
 
     while (state.accumulator >= state.trajectory.frameDurationMs && state.playing) {
       state.accumulator -= state.trajectory.frameDurationMs;
@@ -281,8 +240,6 @@ function animationLoop(timestamp) {
 }
 
 async function loadTrajectory() {
-  setStatus(`Loading ${TRAJECTORY_URL.pathname.split("/").pop()}...`);
-
   const response = await fetch(TRAJECTORY_URL);
   if (!response.ok) {
     throw new Error(`Unable to load trajectory: ${response.status}`);
@@ -298,7 +255,6 @@ async function loadTrajectory() {
   timeline.value = "0";
   updateUi();
   resizeCanvas();
-  setStatus("Loaded backend trajectory from data/trajectory.json");
 }
 
 toggleButton.addEventListener("click", () => {
@@ -323,20 +279,16 @@ timeline.addEventListener("input", (event) => {
   render();
 });
 
-speedControl.addEventListener("input", (event) => {
-  state.speed = clamp(Number(event.target.value), 0.25, 2);
-  updateUi();
-});
-
 window.addEventListener("resize", resizeCanvas);
 
 requestAnimationFrame(animationLoop);
 
 loadTrajectory().catch((error) => {
   state.playing = false;
-  setStatus(error.message);
   titleLabel.textContent = "Load failed";
-  frameLabel.textContent = "0 / 0";
   appleLabel.textContent = "0 / 0";
   toggleButton.textContent = "Play";
+  timeline.max = "0";
+  timeline.value = "0";
+  console.error(error);
 });
