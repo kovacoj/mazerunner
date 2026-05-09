@@ -3,6 +3,7 @@ const context = canvas.getContext("2d");
 
 const titleLabel = document.getElementById("titleLabel");
 const appleLabel = document.getElementById("appleLabel");
+const lengthLabel = document.getElementById("lengthLabel");
 const toggleButton = document.getElementById("toggleButton");
 const timeline = document.getElementById("timeline");
 
@@ -135,9 +136,11 @@ function updateUi() {
   const { frames, apples } = state.trajectory;
   const currentFrame = frames[state.frameIndex];
   const eatenCount = currentFrame.eaten.size;
+  const totalLength = Math.max(frames.length - 1, 0);
 
   titleLabel.textContent = state.trajectory.title;
   appleLabel.textContent = `${eatenCount} / ${apples.length}`;
+  lengthLabel.textContent = `${state.frameIndex} / ${totalLength}`;
   timeline.value = String(state.frameIndex);
   updateToggleButton();
 }
@@ -333,6 +336,7 @@ loadTrajectory().catch((error) => {
   state.playing = false;
   titleLabel.textContent = "Load failed";
   appleLabel.textContent = "0 / 0";
+  lengthLabel.textContent = "0 / 0";
   timeline.max = "0";
   timeline.value = "0";
   updateToggleButton();

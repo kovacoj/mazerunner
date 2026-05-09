@@ -32,6 +32,8 @@ body {
 }
 
 .hero {
+  display: flex;
+  justify-content: center;
   margin-bottom: 28px;
 }
 
@@ -51,6 +53,9 @@ h1 {
   font-size: clamp(2.4rem, 6vw, 4.6rem);
   line-height: 0.95;
   font-weight: 600;
+  font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+  letter-spacing: -0.04em;
 }
 
 .player {
@@ -100,6 +105,7 @@ h1 {
   min-width: min(100%, 280px);
   gap: 14px;
   align-items: center;
+  margin-left: auto;
 }
 
 .button {
@@ -148,5 +154,6 @@ input[type="range"] {
 
   .transport {
     flex-basis: 100%;
+    margin-left: 0;
   }
 }
