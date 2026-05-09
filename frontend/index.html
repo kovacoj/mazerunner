@@ -17,23 +17,19 @@
           <canvas id="board" aria-label="Snake trajectory board"></canvas>
         </div>
 
-        <div class="player__meta">
-          <div>
+        <div class="player__bar">
+          <div class="meta-item">
             <p class="meta-label">Trajectory</p>
             <p class="meta-value" id="titleLabel">Loading...</p>
           </div>
-          <div>
+          <div class="meta-item">
             <p class="meta-label">Apples</p>
             <p class="meta-value" id="appleLabel">0 / 0</p>
           </div>
-        </div>
-
-        <div class="controls">
-          <button id="toggleButton" class="button" type="button">Pause</button>
-          <label class="range-group" for="timeline">
-            <span>Timeline</span>
-            <input id="timeline" type="range" min="0" max="0" value="0" step="1" />
-          </label>
+          <div class="transport">
+            <button id="toggleButton" class="button button--icon" type="button" aria-label="Pause replay" title="Pause replay">&#9208;</button>
+            <input id="timeline" type="range" min="0" max="0" value="0" step="1" aria-label="Trajectory timeline" />
+          </div>
         </div>
       </section>
     </main>

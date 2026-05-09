@@ -81,6 +81,33 @@ function colorForSegment(index, segmentCount) {
   return `hsl(136 86% ${lightness}%)`;
 }
 
+function updateToggleButton() {
+  if (!state.trajectory) {
+    toggleButton.textContent = "\u25b6";
+    toggleButton.setAttribute("aria-label", "Play replay");
+    toggleButton.title = "Play replay";
+    return;
+  }
+
+  if (state.playing) {
+    toggleButton.textContent = "\u23f8";
+    toggleButton.setAttribute("aria-label", "Pause replay");
+    toggleButton.title = "Pause replay";
+    return;
+  }
+
+  if (state.frameIndex === state.trajectory.frames.length - 1) {
+    toggleButton.textContent = "\u21ba";
+    toggleButton.setAttribute("aria-label", "Replay trajectory");
+    toggleButton.title = "Replay trajectory";
+    return;
+  }
+
+  toggleButton.textContent = "\u25b6";
+  toggleButton.setAttribute("aria-label", "Play replay");
+  toggleButton.title = "Play replay";
+}
+
 function updateUi() {
   if (!state.trajectory) {
     return;
@@ -93,7 +120,7 @@ function updateUi() {
   titleLabel.textContent = state.trajectory.title;
   appleLabel.textContent = `${eatenCount} / ${apples.length}`;
   timeline.value = String(state.frameIndex);
-  toggleButton.textContent = state.playing ? "Pause" : state.frameIndex === frames.length - 1 ? "Replay" : "Play";
+  updateToggleButton();
 }
 
 function getBoardMetrics() {
@@ -287,8 +314,8 @@ loadTrajectory().catch((error) => {
   state.playing = false;
   titleLabel.textContent = "Load failed";
   appleLabel.textContent = "0 / 0";
-  toggleButton.textContent = "Play";
   timeline.max = "0";
   timeline.value = "0";
+  updateToggleButton();
   console.error(error);
 });
