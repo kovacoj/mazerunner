@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mazerunner.local/schemas/trajectory.schema.json",
+  "title": "Snake trajectory replay",
+  "type": "object",
+  "required": ["title", "gridSize", "frameDurationMs", "apples", "frames"],
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gridSize": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "frameDurationMs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "apples": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/point"
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["snake", "eaten"],
+        "additionalProperties": false,
+        "properties": {
+          "snake": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/point"
+            }
+          },
+          "eaten": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
