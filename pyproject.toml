@@ -20,4 +20,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-py-modules = ["backend", "trajectory"]
+py-modules = ["backend", "trajectory", "domain", "grid", "optimizer_factory"]
+packages = ["solvers"]
