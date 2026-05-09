@@ -37,19 +37,29 @@ def oracle_next_cell(problem: SnakeProblem, head: tuple[int, int], remaining_mas
 
 
 def q_dataset(problem: SnakeProblem, sample_count: int | None = 256, seed: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
-    states = [
-        ((x, y), remaining_mask)
-        for remaining_mask in range(all_collected_mask(problem) + 1)
-        for x in range(problem.grid_size)
-        for y in range(problem.grid_size)
-    ]
-    start_state = (problem.start, next_mask(problem, problem.start, all_collected_mask(problem)))
-    if sample_count is None or sample_count >= len(states):
-        selected = states
+    full_mask = all_collected_mask(problem)
+    start_state = (problem.start, next_mask(problem, problem.start, full_mask))
+    total_state_count = (full_mask + 1) * problem.grid_size * problem.grid_size
+    if sample_count is None or sample_count >= total_state_count:
+        selected = [
+            ((x, y), remaining_mask)
+            for remaining_mask in range(full_mask + 1)
+            for x in range(problem.grid_size)
+            for y in range(problem.grid_size)
+        ]
     else:
         rng = random.Random(seed)
-        pool = [state for state in states if state != start_state]
-        selected = [start_state, *rng.sample(pool, sample_count - 1)]
+        selected = [start_state]
+        seen = {start_state}
+        while len(selected) < sample_count:
+            state = (
+                (rng.randrange(problem.grid_size), rng.randrange(problem.grid_size)),
+                rng.randrange(full_mask + 1),
+            )
+            if state in seen:
+                continue
+            seen.add(state)
+            selected.append(state)
 
     features = []
     targets = []
@@ -95,9 +105,17 @@ def solve_dqn(
     def scalar_loss() -> torch.Tensor:
         return torch.nn.functional.cross_entropy(model(features), targets.argmax(dim=1))
 
+    def adam_closure() -> torch.Tensor:
+        optimizer.zero_grad()
+        loss = scalar_loss()
+        loss.backward()
+        return loss
+
     for _ in range(train_steps):
         if optimizer_name in {"extended_kalman_filter", "levenberg_marquardt"}:
             optimizer.step(residuals)
+        elif optimizer_name == "adam":
+            optimizer.step(adam_closure)
         else:
             optimizer.step(scalar_loss)
 

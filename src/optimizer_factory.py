@@ -18,6 +18,8 @@ from optimizers import Newton
 
 
 def dqn_optimizer(name: str, params) -> object:
+    if name == "adam":
+        return torch.optim.Adam(params, lr=5e-2)
     if name == "newton":
         return Newton(params, line_search_method="armijo")
     if name == "extended_kalman_filter":
@@ -61,6 +63,8 @@ def route_optimizer(name: str, params) -> object:
 
 
 def kohonen_optimizer(name: str, params) -> object:
+    if name == "adam":
+        return torch.optim.Adam(params, lr=2e-2)
     if name == "extended_kalman_filter":
         return ExtendedKalmanFilter(params, q=1e-5, tau=0.995)
     if name == "levenberg_marquardt":

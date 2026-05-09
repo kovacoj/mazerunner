@@ -21,3 +21,23 @@ Some of these approaches can be mathematically described as a minimization of a 
 - Backend modules: `src/`
 - Replay data and schema: `data/`
 - Optimizer implementations: `optimizers/`
+
+## Generate Replay JSON
+
+Preferred packaged CLI:
+
+```bash
+mazerunner-backend --approach astar --output data/trajectory.json
+```
+
+If you are running directly from the repo checkout without installing the package:
+
+```bash
+PYTHONPATH=src python -m backend --approach astar --output data/trajectory.json
+```
+
+To regenerate the frontend replay library and picker manifest in `data/`:
+
+```bash
+PYTHONPATH=src python -m backend --export-library data
+```

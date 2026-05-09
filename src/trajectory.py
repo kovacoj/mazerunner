@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 
 
@@ -116,6 +117,50 @@ def _step_axis(current: int, target: int, grid_size: int, wall_mode: str) -> int
     return current + (1 if target > current else -1)
 
 
+def _neighbors(point: Point, grid_size: int, wall_mode: str) -> tuple[Point, ...]:
+    candidates = (
+        Point(point.x + 1, point.y),
+        Point(point.x - 1, point.y),
+        Point(point.x, point.y + 1),
+        Point(point.x, point.y - 1),
+    )
+    if wall_mode == "wrap":
+        return tuple(Point(candidate.x % grid_size, candidate.y % grid_size) for candidate in candidates)
+    return tuple(candidate for candidate in candidates if _is_in_bounds(candidate, grid_size))
+
+
+def _shortest_path(
+    start: Point,
+    goal: Point,
+    grid_size: int,
+    wall_mode: str,
+    blocked: set[Point],
+) -> list[Point] | None:
+    if start == goal:
+        return []
+
+    queue: deque[Point] = deque([start])
+    parents: dict[Point, Point | None] = {start: None}
+
+    while queue:
+        point = queue.popleft()
+        for candidate in _neighbors(point, grid_size, wall_mode):
+            if candidate in parents:
+                continue
+            if candidate in blocked and candidate != goal:
+                continue
+            parents[candidate] = point
+            if candidate == goal:
+                path = [candidate]
+                while parents[path[-1]] != start:
+                    path.append(parents[path[-1]])
+                path.reverse()
+                return path
+            queue.append(candidate)
+
+    return None
+
+
 def manhattan_path(start: Point, goal: Point, grid_size: int, wall_mode: str) -> list[Point]:
     x = start.x
     y = start.y
@@ -141,9 +186,6 @@ def _build_frames(
     for next_head in head_path[1:]:
         eaten_index = apple_lookup.get((next_head.x, next_head.y))
         grows = eaten_index is not None and eaten_index not in eaten
-        occupied = current_snake if grows else current_snake[:-1]
-        if next_head in occupied:
-            raise ValueError(f"Trajectory self-collides at {next_head}.")
         current_snake.insert(0, next_head)
         if grows:
             eaten.add(eaten_index)
@@ -181,13 +223,42 @@ def build_trajectory(
     if set(apples_tuple) & set(snake_tuple):
         raise ValueError("Initial snake cannot overlap an apple.")
 
-    head_path = [snake_tuple[0]]
-    current_head = snake_tuple[0]
+    apple_lookup = {(apple.x, apple.y): index for index, apple in enumerate(apples_tuple)}
+    eaten: set[int] = set()
+    current_snake = list(snake_tuple)
+    frames = [Frame(tuple(current_snake), tuple())]
+
     for apple_index in visit_order_tuple:
+        if apple_index in eaten:
+            continue
         target = apples_tuple[apple_index]
-        segment = manhattan_path(current_head, target, grid_size, wall_mode)
-        head_path.extend(segment)
-        current_head = target
+
+        while current_snake[0] != target:
+            relaxed_blocked = set(current_snake[:-1])
+            segment = _shortest_path(current_snake[0], target, grid_size, wall_mode, relaxed_blocked)
+            if segment is None:
+                segment = _shortest_path(current_snake[0], target, grid_size, wall_mode, set(current_snake))
+            if not segment:
+                raise ValueError(f"No replay path from {current_snake[0]} to {target}.")
+
+            next_head = segment[0]
+            eaten_index = apple_lookup.get((next_head.x, next_head.y))
+            grows = eaten_index is not None and eaten_index not in eaten
+            occupied = current_snake if grows else current_snake[:-1]
+            if next_head in occupied:
+                strict_segment = _shortest_path(current_snake[0], target, grid_size, wall_mode, set(current_snake))
+                if not strict_segment:
+                    raise ValueError(f"No snake-safe replay path from {current_snake[0]} to {target}.")
+                next_head = strict_segment[0]
+                eaten_index = apple_lookup.get((next_head.x, next_head.y))
+                grows = eaten_index is not None and eaten_index not in eaten
+
+            current_snake.insert(0, next_head)
+            if grows:
+                eaten.add(eaten_index)
+            else:
+                current_snake.pop()
+            frames.append(Frame(tuple(current_snake), tuple(sorted(eaten))))
 
     return Trajectory(
         title=title,
@@ -195,7 +266,7 @@ def build_trajectory(
         frame_duration_ms=frame_duration_ms,
         wall_mode=wall_mode,
         apples=apples_tuple,
-        frames=_build_frames(apples_tuple, tuple(head_path), snake_tuple),
+        frames=tuple(frames),
     )
 
 

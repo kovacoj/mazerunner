@@ -4,18 +4,83 @@ const context = canvas.getContext("2d");
 const titleLabel = document.getElementById("titleLabel");
 const appleLabel = document.getElementById("appleLabel");
 const lengthLabel = document.getElementById("lengthLabel");
-const toggleButton = document.getElementById("toggleButton");
+const trajectoryPicker = document.getElementById("trajectoryPicker");
 const timeline = document.getElementById("timeline");
 
 const TRAJECTORY_URL = new URL("../data/trajectory.json", import.meta.url);
+const TRAJECTORY_INDEX_URL = new URL("../data/trajectories.json", import.meta.url);
 
 const state = {
   trajectory: null,
+  trajectoryOptions: [],
+  trajectoryFile: "",
   frameIndex: 0,
   playing: true,
   accumulator: 0,
   lastTimestamp: 0,
 };
+
+function setLoadError(message) {
+  state.trajectory = null;
+  state.playing = false;
+  state.frameIndex = 0;
+  state.accumulator = 0;
+  state.lastTimestamp = 0;
+  titleLabel.textContent = message;
+  appleLabel.textContent = "0 / 0";
+  lengthLabel.textContent = "0";
+  timeline.max = "0";
+  timeline.value = "0";
+  render();
+}
+
+function normalizeTrajectoryOption(option, index) {
+  if (!option || typeof option !== "object") {
+    throw new Error(`Trajectory option ${index} is invalid.`);
+  }
+
+  const file = String(option.file || "").trim();
+  if (!file) {
+    throw new Error(`Trajectory option ${index} is missing a file.`);
+  }
+
+  return {
+    label: String(option.label || file),
+    file,
+    group: String(option.group || ""),
+  };
+}
+
+function populateTrajectoryPicker() {
+  trajectoryPicker.replaceChildren();
+
+  const groups = new Map();
+
+  state.trajectoryOptions.forEach((option) => {
+    const element = document.createElement("option");
+    element.value = option.file;
+    element.textContent = option.label;
+
+    if (!option.group) {
+      trajectoryPicker.append(element);
+      return;
+    }
+
+    if (!groups.has(option.group)) {
+      const group = document.createElement("optgroup");
+      group.label = option.group;
+      groups.set(option.group, group);
+      trajectoryPicker.append(group);
+    }
+
+    groups.get(option.group).append(element);
+  });
+
+  trajectoryPicker.disabled = state.trajectoryOptions.length <= 1;
+  if (state.trajectoryFile) {
+    trajectoryPicker.value = state.trajectoryFile;
+  }
+}
 
 function normalizePoint(point) {
   return {
@@ -101,33 +166,6 @@ function colorForSegment(index, segmentCount) {
   return `hsl(136 86% ${lightness}%)`;
 }
 
-function updateToggleButton() {
-  if (!state.trajectory) {
-    toggleButton.textContent = "\u25b6";
-    toggleButton.setAttribute("aria-label", "Play replay");
-    toggleButton.title = "Play replay";
-    return;
-  }
-
-  if (state.playing) {
-    toggleButton.textContent = "\u23f8";
-    toggleButton.setAttribute("aria-label", "Pause replay");
-    toggleButton.title = "Pause replay";
-    return;
-  }
-
-  if (state.frameIndex === state.trajectory.frames.length - 1) {
-    toggleButton.textContent = "\u21ba";
-    toggleButton.setAttribute("aria-label", "Replay trajectory");
-    toggleButton.title = "Replay trajectory";
-    return;
-  }
-
-  toggleButton.textContent = "\u25b6";
-  toggleButton.setAttribute("aria-label", "Play replay");
-  toggleButton.title = "Play replay";
-}
-
 function updateUi() {
   if (!state.trajectory) {
     return;
@@ -141,7 +179,6 @@ function updateUi() {
   appleLabel.textContent = `${eatenCount} / ${apples.length}`;
   lengthLabel.textContent = String(state.frameIndex);
   timeline.value = String(state.frameIndex);
-  updateToggleButton();
 }
 
 function getBoardMetrics() {
@@ -278,7 +315,7 @@ function animationLoop(timestamp) {
   if (state.playing && state.trajectory) {
     state.accumulator += delta;
 
-    while (state.accumulator >= state.trajectory.frameDurationMs && state.playing) {
+    while (state.accumulator >= state.trajectory.frameDurationMs) {
       state.accumulator -= state.trajectory.frameDurationMs;
       advanceFrame();
     }
@@ -288,7 +325,7 @@ function animationLoop(timestamp) {
 }
 
 async function loadTrajectory() {
-  const response = await fetch(TRAJECTORY_URL);
+  const response = await fetch(new URL(`../data/${state.trajectoryFile}`, import.meta.url));
   if (!response.ok) {
     throw new Error(`Unable to load trajectory: ${response.status}`);
   }
@@ -305,20 +342,36 @@ async function loadTrajectory() {
   resizeCanvas();
 }
 
-toggleButton.addEventListener("click", () => {
-  if (!state.trajectory) {
-    return;
+async function loadTrajectoryOptions() {
+  const response = await fetch(TRAJECTORY_INDEX_URL);
+  if (response.ok) {
+    const payload = await response.json();
+    if (!Array.isArray(payload) || payload.length === 0) {
+      throw new Error("Trajectory index must contain at least one option.");
+    }
+    state.trajectoryOptions = payload.map(normalizeTrajectoryOption);
+  } else if (response.status === 404) {
+    state.trajectoryOptions = [{
+      label: "A*",
+      file: TRAJECTORY_URL.pathname.split("/").pop(),
+      group: "Search",
+    }];
+  } else {
+    throw new Error(`Unable to load trajectory index: ${response.status}`);
   }
 
-  if (!state.playing && state.frameIndex === state.trajectory.frames.length - 1) {
-    state.frameIndex = 0;
-    state.accumulator = 0;
-  }
+  state.trajectoryFile = state.trajectoryOptions[0].file;
+  populateTrajectoryPicker();
+}
 
-  state.playing = !state.playing;
-  updateUi();
-  render();
-});
+async function selectTrajectory(file) {
+  state.trajectoryFile = file;
+  trajectoryPicker.value = file;
+  titleLabel.textContent = "Loading...";
+  appleLabel.textContent = "0 / 0";
+  lengthLabel.textContent = "0";
+  await loadTrajectory();
+}
 
 timeline.addEventListener("input", (event) => {
   state.frameIndex = Number(event.target.value);
@@ -327,17 +380,31 @@ timeline.addEventListener("input", (event) => {
   render();
 });
 
+trajectoryPicker.addEventListener("change", async (event) => {
+  try {
+    await selectTrajectory(event.target.value);
+  } catch (error) {
+    setLoadError("Load failed");
+    console.error(error);
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.code !== "Space" || !state.trajectory) {
+    return;
+  }
+
+  event.preventDefault();
+  state.playing = !state.playing;
+});
+
 window.addEventListener("resize", resizeCanvas);
 
 requestAnimationFrame(animationLoop);
 
-loadTrajectory().catch((error) => {
-  state.playing = false;
-  titleLabel.textContent = "Load failed";
-  appleLabel.textContent = "0 / 0";
-  lengthLabel.textContent = "0 / 0";
-  timeline.max = "0";
-  timeline.value = "0";
-  updateToggleButton();
-  console.error(error);
-});
+loadTrajectoryOptions()
+  .then(() => selectTrajectory(state.trajectoryFile))
+  .catch((error) => {
+    setLoadError("Load failed");
+    console.error(error);
+  });

@@ -32,8 +32,20 @@ def solve_kohonen(
         anchor = 0.75 * (nodes[0] - start)
         return torch.cat((fit, smooth, anchor))
 
+    def scalar_loss() -> torch.Tensor:
+        return residuals().pow(2).mean()
+
+    def adam_closure() -> torch.Tensor:
+        optimizer.zero_grad()
+        loss = scalar_loss()
+        loss.backward()
+        return loss
+
     for _ in range(train_steps):
-        optimizer.step(residuals)
+        if optimizer_name in {"extended_kalman_filter", "levenberg_marquardt"}:
+            optimizer.step(residuals)
+        else:
+            optimizer.step(adam_closure)
 
     with torch.no_grad():
         distances = torch.cdist(apples, nodes)

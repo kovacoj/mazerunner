@@ -21,6 +21,10 @@
         </div>
 
         <div class="player__bar">
+          <label class="meta-item meta-item--picker" for="trajectoryPicker">
+            <p class="meta-label">Solution</p>
+            <select id="trajectoryPicker" class="picker" aria-label="Choose trajectory"></select>
+          </label>
           <div class="meta-item">
             <p class="meta-label">Trajectory</p>
             <p class="meta-value" id="titleLabel">Loading...</p>
@@ -33,10 +37,10 @@
             <p class="meta-label">Length</p>
             <p class="meta-value" id="lengthLabel">0 / 0</p>
           </div>
-          <div class="transport">
-            <button id="toggleButton" class="button button--icon" type="button" aria-label="Pause replay" title="Pause replay">&#9208;</button>
-            <input id="timeline" type="range" min="0" max="0" value="0" step="1" aria-label="Trajectory timeline" />
-          </div>
+        </div>
+
+        <div class="player__timeline">
+          <input id="timeline" type="range" min="0" max="0" value="0" step="1" aria-label="Trajectory timeline" />
         </div>
       </section>
     </main>

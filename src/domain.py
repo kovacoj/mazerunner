@@ -5,11 +5,19 @@ from dataclasses import dataclass
 Position = tuple[int, int]
 
 DEFAULT_APPLES: tuple[Position, ...] = (
-    (5, 3),
-    (9, 6),
+    (1, 2),
+    (2, 4),
+    (4, 3),
+    (5, 8),
+    (6, 15),
+    (8, 18),
+    (10, 1),
+    (11, 17),
     (13, 6),
-    (13, 11),
-    (16, 14),
+    (15, 12),
+    (16, 2),
+    (17, 14),
+    (18, 16),
 )
 DEFAULT_FRAME_DURATION_MS = 160
 DEFAULT_WALL_MODE = "wrap"
@@ -18,7 +26,7 @@ DEFAULT_WALL_MODE = "wrap"
 @dataclass(frozen=True)
 class SnakeProblem:
     grid_size: int = 20
-    start: Position = (2, 3)
+    start: Position = (10, 10)
     apples: tuple[Position, ...] = DEFAULT_APPLES
 
 
@@ -47,12 +55,19 @@ class SnakeResult:
 DEFAULT_PROBLEM = SnakeProblem()
 
 DQN_OPTIMIZER_CHOICES = (
+    "adam",
     "newton",
     "extended_kalman_filter",
     "levenberg_marquardt",
     "annealing",
     "metropolis",
     "genetic",
+)
+
+KOHONEN_OPTIMIZER_CHOICES = (
+    "adam",
+    "extended_kalman_filter",
+    "levenberg_marquardt",
 )
 
 APPROACH_CHOICES = (

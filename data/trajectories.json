@@ -1,0 +1,32 @@
+[
+  {
+    "label": "A*",
+    "file": "trajectory.json",
+    "group": "Search"
+  },
+  {
+    "label": "DQN (Adam)",
+    "file": "dqn_adam.json",
+    "group": "Learned"
+  },
+  {
+    "label": "Kohonen",
+    "file": "kohonen.json",
+    "group": "Learned"
+  },
+  {
+    "label": "Genetic",
+    "file": "genetic.json",
+    "group": "Route"
+  },
+  {
+    "label": "Simulated Annealing",
+    "file": "simulated_annealing.json",
+    "group": "Route"
+  },
+  {
+    "label": "Metropolis",
+    "file": "metropolis.json",
+    "group": "Route"
+  }
+]
